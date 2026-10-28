@@ -24,6 +24,7 @@
     <ProjectGuid>{02dee7c6-2705-4456-9d29-d49516ff5e47}</ProjectGuid>
     <RootNamespace>PZ</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Clone_wireshark</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -155,14 +156,19 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="IPv4.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketSequence.cpp" />
     <ClCompile Include="PZ.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ethernet.h" />
+    <ClInclude Include="IPv4.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketSequence.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

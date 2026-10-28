@@ -2,12 +2,12 @@
 
 Packet::Packet(){}
 Packet::~Packet(){}
-void Packet::save_paket(pcap_pkthdr* header, const u_char* data) {
-	time_sec = header->ts.tv_sec;
-	time_usec = header->ts.tv_usec;
-	save_len = header->caplen;
-	orig_len = header->len;
-	this->data.assign(data, data + header->caplen);
+void Packet::save_paket(int time_sec, int time_usec, int save_len, int orig_len,vector<char>& data) {
+	this->time_sec = time_sec;
+	this->time_usec = time_usec;
+	this->save_len = save_len;
+	this->orig_len = orig_len;
+	this->data = data;
 }
 
 int Packet::get_save_len() {

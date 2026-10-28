@@ -21,9 +21,10 @@ int main()
             std::cout << "========== МЕНЮ ==========" << std::endl;
             std::cout << "0. Показать меню" << std::endl;
             std::cout << "1. Показать информацию о файле" << std::endl;
-            std::cout << "2. Показать статистику пакетов" << std::endl;
-            std::cout << "3. Показать статистику" << std::endl;
-            std::cout << "4. Закрыть файл" << std::endl;
+            std::cout << "2. Прочитать пакеты в файле" << std::endl;
+            std::cout << "3. Показать статистику пакетов" << std::endl;
+            std::cout << "4. Показать статистику" << std::endl;
+            std::cout << "5. Закрыть файл" << std::endl;
             std::cout << "-1. Выход" << std::endl;
             std::cout << "Выберите пункт: ";
             cin >> option;
@@ -33,7 +34,19 @@ int main()
             cin >> option;
             break;
         case 2:
+            packets.read_pakets();
+            cin >> option;
+            break;
+        case 3:
             packets.statistik();
+            cin >> option;
+            break;
+        case 4:
+            packets.statistik();
+            cin >> option;
+            break;
+        case 5:
+            packets.close();
             cin >> option;
             break;
         case -1:

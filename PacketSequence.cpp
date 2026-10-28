@@ -3,14 +3,12 @@
 using namespace std;
 PacketSequence::PacketSequence()
 {
-    file_descriptor = nullptr;
-    errbuf[0] = '\0';
+    //errbuf[0] = '\0';
 }
 
 PacketSequence::PacketSequence(string& path)
 {
-    file_descriptor = nullptr;
-    errbuf[0] = '\0';
+    //errbuf[0] = '\0';
     open(path);
 }
 
@@ -19,30 +17,40 @@ PacketSequence::~PacketSequence()
     close();
 }
 
+unsigned int PacketSequence::read32()
+{
+	unsigned int value;
+    file.read((char*)&value, 4);
+    return value;
+}
+
+unsigned short PacketSequence::read16()
+{
+    unsigned short value;
+    file.read((char*)&value, 2);
+    return value;
+}
+
 void PacketSequence::open(string& path)
 {
     if (path.find('"') != string::npos){
 		path.erase(remove(path.begin(), path.end(), '"'), path.end());
     }
-    file_descriptor = pcap_open_offline(path.c_str(), errbuf);
+    file.open(path, ios::binary);
     file_name = path.substr(path.find_last_of("/\\") + 1);
 }
 
 void PacketSequence::close()
 {
-    if (file_descriptor != nullptr)
+    if (file.is_open())
     {
-        pcap_close(file_descriptor);
-        file_descriptor = nullptr;
+		file.close();
     }
 
     errbuf[0] = '\0';
 }
 
-bool PacketSequence::isOpen()
-{
-    return file_descriptor != nullptr;
-}
+
 const char* PacketSequence::lastError()
 {
     return (errbuf[0] != '\0') ? errbuf : "OK";
@@ -50,15 +58,20 @@ const char* PacketSequence::lastError()
 
 void PacketSequence::statistik()
 {
-    
+    std::cout << "Количество пакетов в файле: " << count_paket << '\n';
+    std::cout << "Минимальный размер пакета: " << min_len << '\n';
+    std::cout << "Максимальный размер пакета: " << max_len << '\n';
+    std::cout << "Средний размер пакета: " << sr_len << '\n';
 }
 void PacketSequence::header()
 { 
-    version_major = pcap_major_version(file_descriptor);
-    version_minor = pcap_minor_version(file_descriptor);
-    paket_len = pcap_snapshot(file_descriptor);
-    networ = pcap_datalink(file_descriptor);
-    magic_number = pcap_is_swapped(file_descriptor);
+    magic_number = read32();
+	version_major = read16();
+    version_major = read16();
+	thiszone = read32();
+	sigfigs = read32();
+	paket_len = read32();
+    networ = read32();
     std::cout << "Информаци о файле: " << file_name << '\n';
     std::cout << "Старшая версия формата: " << version_major << '\n';
     std::cout << "Младшая версия формата: " << version_minor << '\n';
@@ -68,14 +81,21 @@ void PacketSequence::header()
 }
 
 void PacketSequence::read_pakets() {
-    pcap_pkthdr* header;
-    const u_char* data;
-    while (pcap_next_ex(file_descriptor, &header, &data) == 1) {
+    while (1) {
+        if (!file) break;
         count_paket++;
         Packet temp;
-        temp.save_paket(header, data);
+        int time_sec = read32();
+        int time_usec = read32();
+        int save_len = read32();
+        int orig_len = read32();
+		vector <char> data(save_len);
+        file.read(data.data(), save_len);
+        temp.save_paket(time_sec, time_usec, save_len, orig_len, data);
         pakets.push_back(temp);
         min_len = min(temp.get_save_len(), min_len);
         max_len = max(temp.get_save_len(), max_len);
+		sum += temp.get_save_len();
     }
+	sr_len = sum / count_paket;
 }
